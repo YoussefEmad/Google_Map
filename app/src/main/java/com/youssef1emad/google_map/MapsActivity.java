@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -57,47 +58,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-        /**
-         * Manipulates the map once available.
-         * This callback is triggered when the map is ready to be used.
-         * This is where we can add markers or lines, add listeners or move the camera. In this case,
-         * we just add a marker near Sydney, Australia.
-         * If Google Play services is not installed on the device, the user will be prompted to install
-         * it inside the SupportMapFragment. This method will only be triggered once the user has
-         * installed Google Play services and returned to the app.
-         */
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
     @Override
-    public void onMapReady( GoogleMap googleMap) {
+    public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
         if (mMap != null) {
             mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 @Override
                 public View getInfoWindow(Marker marker) {
+
                     return null;
                 }
 
                 @Override
                 public View getInfoContents(Marker marker) {
                     View v = getLayoutInflater().inflate(R.layout.clickable_form, null);
-                   // TextView tvLocality = v.findViewById(R.id.tv_locality);
+                    // TextView tvLocality = v.findViewById(R.id.tv_locality);
                     //TextView tvLat = v.findViewById(R.id.tv_lat);
 
                     //TextView tvLog = v.findViewById(R.id.tv_lng);
                     //TextView tvSnippet = v.findViewById(R.id.tv_snippet);
-                    EditText etc = (EditText)v.findViewById(R.id.editText2);
-                    Button btn = (Button)v.findViewById(R.id.btn);
+                    EditText etc = (EditText) v.findViewById(R.id.editText2);
+                    Button btn = (Button) v.findViewById(R.id.btn);
 
 
                     LatLng ll = marker.getPosition();
@@ -113,7 +104,85 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         mMap.setMyLocationEnabled(true);
+    }
+    public class MarkerDemoActivity extends AppCompatActivity implements
+            GoogleMap.OnInfoWindowClickListener,
+            OnMapReadyCallback {
+
+        private GoogleMap mMap;
+
+        @Override
+        public void onMapReady(GoogleMap map) {
+            mMap = map;
+    // Add markers to the map and do other map setup.
+            if (mMap != null) {
+                mMap.setInfoWindowAdapter(new InfoWindowAdapter(MapsActivity.this));
+
+                /*new GoogleMap.InfoWindowAdapter() {
+                    @Override
+                    public View getInfoWindow(Marker marker) {
+
+                        return null;
+                    }
+
+                    @Override
+                    public View getInfoContents(Marker marker) {
+                        View v = getLayoutInflater().inflate(R.layout.clickable_form, null);
+                        // TextView tvLocality = v.findViewById(R.id.tv_locality);
+                        //TextView tvLat = v.findViewById(R.id.tv_lat);
+
+                        //TextView tvLog = v.findViewById(R.id.tv_lng);
+                        //TextView tvSnippet = v.findViewById(R.id.tv_snippet);
+                        EditText etc = (EditText) v.findViewById(R.id.editText2);
+                        Button btn = (Button) v.findViewById(R.id.btn);
+
+
+                        LatLng ll = marker.getPosition();
+                        //tvLocality.setText(marker.getTitle());
+                        //tvLat.setText("latitude" + ll.latitude);
+                        //tvLog.setText("longitude" + ll.longitude);
+                        //tvSnippet.setText(marker.getSnippet());
+
+                        return v;
+                    }
+                }*/
+
+            }
+
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            mMap.setMyLocationEnabled(true);
+
+            // Set a listener for info window events.
+            mMap.setOnInfoWindowClickListener(this);
+        }
+
+        @Override
+        public void onInfoWindowClick(Marker marker) {
+            Toast.makeText(this, "Info window clicked",
+                    Toast.LENGTH_SHORT).show();
+
+        }
     }
 
 
