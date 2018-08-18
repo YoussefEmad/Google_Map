@@ -3,14 +3,21 @@ package com.youssef1emad.google_map;
 import android.Manifest;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +53,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     EditText editText2;
     Button btn;
+    ImageView img1;
 
     /**youssef Emad android developer**/
     @Override
@@ -54,9 +63,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
+        initializeDialog();
+        img1 = (ImageView)findViewById(R.id.img1);
 
     }
+    Dialog dialog;
+
+    public void initializeDialog() {
+        View viewDialog = LayoutInflater.from(this).inflate(
+                R.layout.clickable_form, null);
+        btn = viewDialog.findViewById(R.id.btn);
+        AlertDialog.Builder builderRate = new AlertDialog.Builder(this, R.style.CustomDialog);
+        builderRate.setCancelable(true);
+        builderRate.setView(viewDialog);
+        dialog = builderRate.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MapsActivity.this, "saved", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
+
+    }
+
 
     /**
      * Manipulates the map once available.
@@ -72,34 +104,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         if (mMap != null) {
-            mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-                @Override
-                public View getInfoWindow(Marker marker) {
-
-                    return null;
-                }
-
-                @Override
-                public View getInfoContents(Marker marker) {
-                    View v = getLayoutInflater().inflate(R.layout.clickable_form, null);
-                    // TextView tvLocality = v.findViewById(R.id.tv_locality);
-                    //TextView tvLat = v.findViewById(R.id.tv_lat);
-
-                    //TextView tvLog = v.findViewById(R.id.tv_lng);
-                    //TextView tvSnippet = v.findViewById(R.id.tv_snippet);
-                    EditText etc = (EditText) v.findViewById(R.id.editText2);
-                    Button btn = (Button) v.findViewById(R.id.btn);
-
-
-                    LatLng ll = marker.getPosition();
-                    //tvLocality.setText(marker.getTitle());
-                    //tvLat.setText("latitude" + ll.latitude);
-                    //tvLog.setText("longitude" + ll.longitude);
-                    //tvSnippet.setText(marker.getSnippet());
-
-                    return v;
-                }
-            });
+//            mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+//                @Override
+//                public View getInfoWindow(Marker marker) {
+//
+//                    return null;
+//                }
+//
+//                @Override
+//                public View getInfoContents(Marker marker) {
+//                    View v = getLayoutInflater().inflate(R.layout.clickable_form, null);
+//                    // TextView tvLocality = v.findViewById(R.id.tv_locality);
+//                    //TextView tvLat = v.findViewById(R.id.tv_lat);
+//
+//                    //TextView tvLog = v.findViewById(R.id.tv_lng);
+//                    //TextView tvSnippet = v.findViewById(R.id.tv_snippet);
+//                    EditText etc = (EditText) v.findViewById(R.id.editText2);
+//                    Button btn = (Button) v.findViewById(R.id.btn);
+//
+//
+//                    LatLng ll = marker.getPosition();
+//                    //tvLocality.setText(marker.getTitle());
+//                    //tvLat.setText("latitude" + ll.latitude);
+//                    //tvLog.setText("longitude" + ll.longitude);
+//                    //tvSnippet.setText(marker.getSnippet());
+//
+//                    return v;
+//                }
+//            });
 
         }
 
@@ -116,6 +148,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         mMap.setMyLocationEnabled(true);
     }
+
+    public void upload(View view) {
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        //Toast.makeText(this, "photo has been saved", Toast.LENGTH_SHORT).show();
+        startActivityForResult(intent, 100);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100 && resultCode == RESULT_OK && data != null){
+            try {
+                Uri uri = data.getData();
+                img1.setImageURI(uri);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+
+
+    }
+
     public class MarkerDemoActivity extends AppCompatActivity implements
             GoogleMap.OnInfoWindowClickListener,
             OnMapReadyCallback {
@@ -127,7 +183,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap = map;
     // Add markers to the map and do other map setup.
             if (mMap != null) {
-                mMap.setInfoWindowAdapter(new InfoWindowAdapter(MapsActivity.this));
+//                mMap.setInfoWindowAdapter(new InfoWindowAdapter(MapsActivity.this));
 
                 /*new GoogleMap.InfoWindowAdapter() {
                     @Override
@@ -232,6 +288,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //.snippet("iam here");
 
                 marker =  mMap.addMarker(options);
+
+                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        dialog.show();
+                        return false;
+                    }
+                });
             }else
             {
                 Toast.makeText(this, "No such address ya youssef", Toast.LENGTH_SHORT).show();
